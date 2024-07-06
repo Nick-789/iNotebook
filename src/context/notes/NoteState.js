@@ -1,93 +1,115 @@
-
-import NoteContext from "./notecontext";
 import { useState } from "react";
+import noteContext from "./notecontext";
+// require('dotenv').config({path:__dirname+'../../../.env'});
 
 const NoteState = (props) => {
-  const host = "http://localhost:5000"
-  const notesInitial = []
-  const [notes, setNotes] = useState(notesInitial)
-
-  // Get all Notes
+  
+  const initialnotes = []
+  const [notes, setNotes] = useState(initialnotes);
+  // const LINK = process.env.REACT_APP_LINK;
+  //Get all notes
   const getNotes = async () => {
-    // API Call 
-    const response = await fetch(`${host}/api/notes/fetchallnotes`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        "auth-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjY4NWEwZjdlZDBiZTE4MmY2YzgzMmI5In0sImlhdCI6MTcyMDE3MDM3Mn0.jF1jRu7qX3D_gsmk_REI85xjhNLIUNRaHkqfw1LzUow"
-      }
-    });
-    const json = await response.json() 
-    setNotes(json)
+    //To do api call
+    try {
+      // console.log("In fetchNotes");
+      // console.log(process.env.REACT_APP_LINK);
+      // console.log(localStorage.getItem('token'));
+      const response = await fetch(`http://localhost:5000/api/notes/fetchallnotes`, {
+        method: "GET",
+         headers: {
+          "Content-Type": "application/json",
+          "auth-token": localStorage.getItem('token')
+  
+        },
+      });
+      // console.log("After fetch notes")
+      // eslint-disable-next-line
+      // console.log(json);
+      const json = await response.json();
+      // console.log(json);
+      setNotes(json);
+  
+    } catch (error) {
+      // console.log("In fetchNotes error");
+      console.log(error.message,"Hey In fetch");
+    }
+    
   }
+ 
 
-  // Add a Note
+  // Add a note
   const addNote = async (title, description, tag) => {
-    // TODO: API Call
-    // API Call 
-    const response = await fetch(`${host}/api/notes/addnote`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        "authtoken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjY4NWEwZjdlZDBiZTE4MmY2YzgzMmI5In0sImlhdCI6MTcyMDE3MDM3Mn0.jF1jRu7qX3D_gsmk_REI85xjhNLIUNRaHkqfw1LzUow"
-          
-      },
-      body: JSON.stringify({title, description, tag})
-    });
+    //To do api call
+    // eslint-disable-next-line 
+    const response = await fetch(`http://localhost:5000/api/notes/addnote`, {
+      method: "POST",
 
-    const note = await response.json();
-    console.log(note); 
+      headers: {
+        "Content-Type": "application/json",
+        "auth-token": localStorage.getItem('token'),
+      },
+
+      body: JSON.stringify({ title, description, tag }),
+    }).then(function (response) {
+      const note =  response.json();
+
     setNotes(notes.concat(note))
+    })
+    
+    
   }
 
-  // Delete a Note
+
+  // Delete a note
   const deleteNote = async (id) => {
-    // API Call
-    const response = await fetch(`${host}/api/notes/deletenote/${id}`, {
-      method: 'DELETE',
+    const response = await fetch(`http://localhost:5000/api/notes/deletenote/${id}`, {
+      method: "DELETE",
       headers: {
-        'Content-Type': 'application/json',
-        "auth-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjY4NWEwZjdlZDBiZTE4MmY2YzgzMmI5In0sImlhdCI6MTcyMDE3MDM3Mn0.jF1jRu7qX3D_gsmk_REI85xjhNLIUNRaHkqfw1LzUow"
-      }
-    });
-    const json = response.json(); 
-    const newNotes = notes.filter((note) => { return note._id !== id })
-    setNotes(newNotes)
-  }
+        "Content-Type": "application/json",
+        "auth-token": localStorage.getItem('token')
 
-  // Edit a Note
-  const editNote = async (id, title, description, tag) => {
-    // API Call 
-    const response = await fetch(`${host}/api/notes/updatenote/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        "auth-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjY4NWEwZjdlZDBiZTE4MmY2YzgzMmI5In0sImlhdCI6MTcyMDE3MDM3Mn0.jF1jRu7qX3D_gsmk_REI85xjhNLIUNRaHkqfw1LzUow"
       },
-      body: JSON.stringify({title, description, tag})
     });
-    const json = await response.json(); 
-
-     let newNotes = JSON.parse(JSON.stringify(notes))
-    // Logic to edit in client
-    for (let index = 0; index < newNotes.length; index++) {
-      const element = newNotes[index];
-      if (element._id === id) {
-        newNotes[index].title = title;
-        newNotes[index].description = description;
-        newNotes[index].tag = tag; 
-        break; 
-      }
-    }  
+    // eslint-disable-next-line
+    const json = await response.json();
+    console.log(json);
+    const newNotes = notes.filter((note) => { return note._id !== id })
     setNotes(newNotes);
   }
 
+  //Update a note
+
+  const editNote = async (id, title, description, tag) => {
+    // eslint-disable-next-line 
+    const response = await fetch(`http://localhost:5000/api/notes/updatenote/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "auth-token": localStorage.getItem('token')
+
+      },
+
+      body: JSON.stringify({title, description, tag}),
+    });
+    // const json = await response.json();
+    let newNotes = JSON.parse(JSON.stringify(notes))
+    for (let index = 0; index < newNotes.length; index++) {
+      const element = newNotes[index];
+      if (element._id === id) {
+        newNotes.title = title;
+        newNotes.description = description;
+        newNotes.tag = tag;
+        break;
+      }
+    }
+    setNotes(newNotes);
+  }
+  
   return (
-    <NoteContext.Provider value={{ notes, addNote, deleteNote, editNote, getNotes }}>
+    <noteContext.Provider value={{ notes, addNote, deleteNote, editNote, getNotes }}>
       {props.children}
-    </NoteContext.Provider>
+    </noteContext.Provider>
   )
-
-}
-export default NoteState;
-
+         
+}  
+export default NoteState; 
