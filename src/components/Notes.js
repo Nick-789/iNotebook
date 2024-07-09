@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import noteContext from "../context/notes/notecontext"
 import Noteitem from './Noteitem';
 import AddNote from './AddNote';
+import NoteState from '../context/notes/NoteState';
 
 const Notes = () => {
     const context = useContext(noteContext);
@@ -30,7 +31,8 @@ const Notes = () => {
 
     return (
         <>
-            <AddNote />
+        <NoteState>    <AddNote /></NoteState>
+        
             <button ref={ref} type="button" className="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#exampleModal">
                 Launch demo modal
             </button>
